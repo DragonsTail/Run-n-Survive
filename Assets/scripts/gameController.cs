@@ -58,7 +58,7 @@ public class gameController : MonoBehaviour {
 		{
 			Vector3 position = new Vector3(Random.Range(-15,15),Random.Range(-10,10),0);
 			Instantiate (enemyA, position, Quaternion.identity);
-			yield return new WaitForSeconds (0.1f);
+			yield return new WaitForSeconds (0.4f);
 		}
 	}
 	IEnumerator exitDoor()
