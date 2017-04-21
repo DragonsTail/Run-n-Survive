@@ -4,32 +4,43 @@ using UnityEngine.UI;
 
 public class playerMove : MonoBehaviour {
 
-
+//------UI-----
 	public Text ammo;
-	public Transform target;
-	public float followSpeed = 6;
-	public Text finishGameText;
+	public static int ammoCount;
+	public Text people;
+	public static int peopleCount;
+	public Text peopleDead;
+	public static int peopleDeadCount;
+	public Text endlevelScore;
+	public Text enemyKills;
+	public static int enemyKillsCounter;
+	public Text UIKillsCounter;
 	public GameObject infoGamePanel;
 	public GameObject loosePanel;
 	public GameObject winPanel;
-	public static int ammoCount;
+	public Text finishGameText;
+
+//----Gameobjects----
+	public Transform target;
+	public float followSpeed = 6f;
 	public static bool shootButton;
 	public GameObject playerDieFX;
-
-// Bullets
+//-----Bullets------
 	public GameObject bulletPrefab;
 	public bool gunReloadTime;
-
 	public Transform other;
 
 	void Start () {
-
+		peopleCount = 0;
+		peopleDeadCount = 0;
 		infoGamePanel.gameObject.SetActive (false);
 		loosePanel.gameObject.SetActive (false);
 		winPanel.gameObject.SetActive (false);
 		StartCoroutine (infoBanner ());
 		gunReloadTime = true;
 		ammoCount = 20;
+		//followSpeed = Random.Range (20f, 40f);
+		enemyKillsCounter = 0;
 	}
 	IEnumerator infoBanner()
 	{
@@ -40,6 +51,14 @@ public class playerMove : MonoBehaviour {
 	}
 	void Update()
 	{
+		//UI unit counters
+		people.text = peopleCount.ToString ();
+		peopleDead.text = peopleDeadCount.ToString ();
+		endlevelScore.text = peopleCount.ToString ();
+		enemyKills.text = enemyKillsCounter.ToString ();
+		UIKillsCounter.text = enemyKillsCounter.ToString ();
+
+
 
 		if (Input.GetKey (KeyCode.D)) {
 			transform.localScale = new Vector3 (-2, 2, 2);
@@ -59,7 +78,7 @@ public class playerMove : MonoBehaviour {
 				ammoCount -= 1;
 				updateAmmo ();
 			} else {
-				print ("No ammo");
+				return;
 			}
 		} 
 		if (ammoCount <= 0) {
@@ -95,27 +114,26 @@ public class playerMove : MonoBehaviour {
 		{
 			if (other.gameObject.tag == "door") 
 			{
-				Destroy (gameObject);
+				endLevel ();
 				winPanel.gameObject.SetActive (true);
-				Time.timeScale = 0;
-				finishGameText.text = "You made it!";
-				Debug.Log ("Exit Collision");
 			}
 		}
-
 		if(other.gameObject.tag == "Enemy")
 		{
 			Instantiate (playerDieFX, transform.position, transform.rotation);
-
-			Destroy (gameObject);
 			loosePanel.gameObject.SetActive (true);
-			Time.timeScale = 0;
-			finishGameText.text = "Game Over";
+			endLevel ();
 		}
 	}
-
 	void updateAmmo()
 	{
 		ammo.text = ammoCount.ToString ();
+	}
+	void endLevel()
+	{
+		Destroy (gameObject);
+		Time.timeScale = 0;
+		//peopleCount = 0;
+		//peopleDeadCount = 0;
 	}
 }

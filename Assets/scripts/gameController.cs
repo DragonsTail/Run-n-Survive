@@ -10,6 +10,10 @@ public class gameController : MonoBehaviour {
 	public Transform enemyATransform;
 	//private float closeDistance = 10;
 
+	private int gameClock;
+
+	public GameObject startPanelUI;
+
 	public Transform playerTarget;
 
 	public GameObject exitDoorPrefab;
@@ -33,21 +37,10 @@ public class gameController : MonoBehaviour {
 	void Start () 
 		{
 
+	}
 
-		Time.timeScale = 1;
-
-		exitDoorCount = 1;
-		StartCoroutine (enemyAspawn ());
-		StartCoroutine (keySpawn ());
-		StartCoroutine (exitDoor ());
-
-		for(int y = -1; y < mapHeight; y++)
-		{
-			for( int x = -1; x < mapWidth; x++)
-			{
-				Instantiate (tilePrefab, new Vector3 (x * envSize , y * envSize, 0), Quaternion.identity);
-			}
-		}
+	void Update()
+	{
 	}
 
 	IEnumerator enemyAspawn()
@@ -80,9 +73,39 @@ public class gameController : MonoBehaviour {
 			Instantiate (key, position, Quaternion.identity);
 		}
 	}
+	public void gameStart()
+	{
+		Time.timeScale = 1;
+		startPanelUI.SetActive(false);
 
+
+
+		//		mapWidth = Random.Range (1, 12);
+		//		mapHeight = Random.Range (1, 8);
+
+		mapWidth = Random.Range (3, 3);
+		mapHeight = Random.Range (3, 3);
+
+		enemyACount = Random.Range (15, 100);
+		Time.timeScale = 1;
+
+		exitDoorCount = 1;
+		StartCoroutine (enemyAspawn ());
+		StartCoroutine (keySpawn ());
+		StartCoroutine (exitDoor ());
+
+		for(int y = -1; y < mapHeight; y++)
+		{
+			for( int x = -1; x < mapWidth; x++)
+			{
+				Instantiate (tilePrefab, new Vector3 (x * envSize , y * envSize, 0), Quaternion.identity);
+			}
+		}
+	}
 	public void restartLevel()
 	{
 		SceneManager.LoadScene ("halTalks_scene_01");
 	}
+
+
 }

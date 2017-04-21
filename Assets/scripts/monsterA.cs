@@ -11,11 +11,10 @@ public class monsterA : MonoBehaviour {
 	public float dist;
 	public GameObject explosion;
 
+
 	void Start ()
 	{
-		walkSpeed = (Random.Range(1.0f, 2.0f));
-
-		this.GetComponent<BoxCollider2D>().enabled = false;
+		walkSpeed = Random.Range(2f,4f);
 
 		GameObject go =  GameObject.FindGameObjectWithTag("Player");
 		if (go != null) {
@@ -24,32 +23,40 @@ public class monsterA : MonoBehaviour {
 		else {
 			target = null;
 		}
-
-		StartCoroutine (enemyAttack ());
 	}
 	void FixedUpdate () 
 	{
-		dist = Vector3.Distance (transform.position, target.position);
-		if(dist < 10f)
-		{
-		transform.position = Vector3.MoveTowards (transform.position, target.position, Time.deltaTime * walkSpeed);
-		}
-	
+		StartCoroutine (enemyAttack ());
 	}
 	IEnumerator enemyAttack()
 	{
 		yield return new WaitForSeconds (0.8f);
 		{
 			this.GetComponent<BoxCollider2D>().enabled = true;
+			dist = Vector3.Distance (transform.position, target.position);
+			if(dist < 10f)
+			{
+				transform.position = Vector3.MoveTowards (transform.position, target.position, Time.deltaTime * walkSpeed);
+			}
 		}
 	}
-
 	void OnCollisionEnter2D(Collision2D other)
 	{
 		if (other.gameObject.tag == "bullet")
+		{	
+			this.GetComponent<Collider2D>().isTrigger = true;
+
+			StartCoroutine (enemyDie());
+		}
+	}
+	IEnumerator enemyDie()
+	{
+		yield return new WaitForSeconds (0.0f);
 		{
-			Instantiate(explosion,transform.position,transform.rotation);
+			playerMove.enemyKillsCounter += 1;
+			Instantiate (explosion, transform.position, transform.rotation);
 			Destroy (gameObject);
 		}
+
 	}
 }
