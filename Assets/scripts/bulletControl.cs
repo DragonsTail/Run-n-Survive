@@ -7,6 +7,7 @@ public class bulletControl : MonoBehaviour {
 	private Transform playerPos;
 	public Transform shootPos;
 	private float closestDist;
+	public GameObject particleHit;
 
 	void Start ()
 	{
@@ -29,6 +30,8 @@ public class bulletControl : MonoBehaviour {
 	}
 	void Update()
 	{
+		Destroy (gameObject,0.5f);
+
 		if (shootPos != null) {
 			transform.position = Vector3.MoveTowards (transform.position, shootPos.position, Time.deltaTime * bulletSpeed);
 			transform.right = shootPos.position - transform.position;
@@ -36,12 +39,14 @@ public class bulletControl : MonoBehaviour {
 			Destroy (gameObject);
 
 		}
-		//Destroy (gameObject, 0.4F);
+
 	}
-	void OnTriggerEnter2D(Collider2D other)
+	void OnCollisionEnter2D(Collision2D other)
 	{
 		if (other.gameObject.tag == "Enemy")
 		{
+			Instantiate (particleHit, transform.position, transform.rotation);
+			particleHit.GetComponent<ParticleSystem>().loop = false;
 			Destroy (gameObject);
 		}
 	}

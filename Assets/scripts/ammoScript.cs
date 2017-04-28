@@ -11,6 +11,7 @@ public class ammoScript : MonoBehaviour {
 			print ("Ammo restrocked");
 			Destroy (gameObject);
 			playerMove.enemyKillsCounter += 1;
+			Destroy (gameObject, 3);
 		}
 	}
 }

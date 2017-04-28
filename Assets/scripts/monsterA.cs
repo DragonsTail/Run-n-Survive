@@ -11,10 +11,17 @@ public class monsterA : MonoBehaviour {
 	public float dist;
 	public GameObject explosion;
 
+	public float MinWalkSpeed = 2f;
+	public float MaxWalkSpeed = 4f;
+
+	public float maxHealth = 100;
+	public float currentHealth = 0;
+	public float damage;
+	public GameObject healthBar;
 
 	void Start ()
 	{
-		walkSpeed = Random.Range(2f,4f);
+		walkSpeed = Random.Range(MinWalkSpeed,MaxWalkSpeed);
 
 		GameObject go =  GameObject.FindGameObjectWithTag("Player");
 		if (go != null) {
@@ -23,16 +30,20 @@ public class monsterA : MonoBehaviour {
 		else {
 			target = null;
 		}
+
+		currentHealth = maxHealth;
 	}
 	void FixedUpdate () 
 	{
 		StartCoroutine (enemyAttack ());
+		if (playerMove.killAll == true) {
+			Destroy (gameObject);
+		}
 	}
 	IEnumerator enemyAttack()
 	{
 		yield return new WaitForSeconds (0.8f);
 		{
-			this.GetComponent<BoxCollider2D>().enabled = true;
 			dist = Vector3.Distance (transform.position, target.position);
 			if(dist < 10f)
 			{
@@ -44,19 +55,21 @@ public class monsterA : MonoBehaviour {
 	{
 		if (other.gameObject.tag == "bullet")
 		{	
-			this.GetComponent<Collider2D>().isTrigger = true;
+			//health--;
+			currentHealth -= damage;
+			float calcHealth = currentHealth / maxHealth;
+			setHealthBar (calcHealth);
 
-			StartCoroutine (enemyDie());
+			if (currentHealth <= 0) 
+			{
+				playerMove.enemyKillsCounter += 1;
+				Instantiate (explosion, transform.position, transform.rotation);
+				Destroy (gameObject);
+			}
 		}
 	}
-	IEnumerator enemyDie()
+	public void setHealthBar( float myHealth)
 	{
-		yield return new WaitForSeconds (0.0f);
-		{
-			playerMove.enemyKillsCounter += 1;
-			Instantiate (explosion, transform.position, transform.rotation);
-			Destroy (gameObject);
-		}
-
+		healthBar.transform.localScale = new Vector3 (myHealth, healthBar.transform.localScale.y, healthBar.transform.localScale.z);
 	}
 }

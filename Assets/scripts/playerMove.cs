@@ -25,12 +25,22 @@ public class playerMove : MonoBehaviour {
 	public float followSpeed = 6f;
 	public static bool shootButton;
 	public GameObject playerDieFX;
+	public static bool killAll;
+	public static bool playerDead;
+	public GameObject exitDoorPrefab;
+	public int exitDoorCount;
+	private float spawnWidth = 10f;
+	private float spawnHeight =5f;
+
+
 //-----Bullets------
 	public GameObject bulletPrefab;
 	public bool gunReloadTime;
 	public Transform other;
 
 	void Start () {
+		playerDead = false;
+		killAll = false;
 		peopleCount = 0;
 		peopleDeadCount = 0;
 		infoGamePanel.gameObject.SetActive (false);
@@ -38,7 +48,7 @@ public class playerMove : MonoBehaviour {
 		winPanel.gameObject.SetActive (false);
 		StartCoroutine (infoBanner ());
 		gunReloadTime = true;
-		ammoCount = 20;
+		//ammoCount = 20;
 		//followSpeed = Random.Range (20f, 40f);
 		enemyKillsCounter = 0;
 	}
@@ -47,6 +57,16 @@ public class playerMove : MonoBehaviour {
 		yield return new WaitForSeconds (1f);
 		{
 			infoGamePanel.gameObject.SetActive (false);
+		}
+	}
+
+	IEnumerator exitDoor()
+	{
+		yield return new WaitForSeconds (0);
+		for (int i = 0; i < exitDoorCount; i++) 
+		{
+			Vector3 position = new Vector3 (Random.Range (-spawnHeight, spawnHeight), Random.Range (-spawnWidth, spawnWidth), 0);
+			Instantiate (exitDoorPrefab, position, Quaternion.identity);
 		}
 	}
 	void Update()
@@ -61,10 +81,10 @@ public class playerMove : MonoBehaviour {
 
 
 		if (Input.GetKey (KeyCode.D)) {
-			transform.localScale = new Vector3 (-2, 2, 2);
+			transform.localScale = new Vector3 (-4, 4, 4);
 		}
 		if (Input.GetKey (KeyCode.A)) {
-			transform.localScale = new Vector3 (2, 2, 2);
+			transform.localScale = new Vector3 (4, 4, 4);
 					}
 		if (Input.GetKeyDown ("m"))
 		{
@@ -85,8 +105,6 @@ public class playerMove : MonoBehaviour {
 			ammoCount = 0;
 			updateAmmo ();
 		}
-
-			
 	}
 
 	IEnumerator fireBullet()
@@ -101,21 +119,25 @@ public class playerMove : MonoBehaviour {
 
 	void FixedUpdate () 
 	{
-
-		transform.position = Vector3.Lerp(transform.position, target.position, Time.deltaTime * followSpeed);
+		//--This is the code for the player to follow the camera if the camera is used to move around the world.--
+		//transform.position = Vector3.Lerp(transform.position, target.position, Time.deltaTime * followSpeed);
 	}
 	void OnCollisionEnter2D(Collision2D other)
 	{
 		if(other.gameObject.tag == "key")
 		{
 			Debug.Log ("Key Collision");
+			StartCoroutine (exitDoor ());
+
 		}
 		if(keyTrigger.hasKey)
 		{
 			if (other.gameObject.tag == "door") 
 			{
 				endLevel ();
-				winPanel.gameObject.SetActive (true);
+				//winPanel.gameObject.SetActive (true);
+				loosePanel.gameObject.SetActive (true);
+
 			}
 		}
 		if(other.gameObject.tag == "Enemy")
@@ -131,7 +153,10 @@ public class playerMove : MonoBehaviour {
 	}
 	void endLevel()
 	{
+		Instantiate (playerDieFX, transform.position, transform.rotation);
+		killAll = true;
 		Destroy (gameObject);
+		playerDead = true;
 		Time.timeScale = 0;
 		//peopleCount = 0;
 		//peopleDeadCount = 0;
